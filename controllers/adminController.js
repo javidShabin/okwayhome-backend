@@ -154,7 +154,16 @@ const updateProfile = async (req, res) => {
 
 const checkAdmin = async (req, res) => {
   try {
-  } catch (error) {}
+    const admin = req.admin;
+    if (!admin) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Admin not autherised" });
+    }
+    res.json({ success: true, message: "Admin autherised" });
+  } catch (error) {
+    res.status(401).json(error);
+  }
 };
 
 module.exports = {
