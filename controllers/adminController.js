@@ -103,7 +103,21 @@ const logoutAdmin = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-  } catch (error) {}
+    const admin = req.admin;
+    const adminData = await Admin.findOne({ _id: admin.id });
+    const { image, name, email, phone, _id } = adminData;
+    res.json({
+      success: true,
+      message: "Admin profile",
+      image,
+      name,
+      email,
+      phone,
+      _id,
+    });
+  } catch (error) {
+    res.status(401).json(error);
+  }
 };
 
 const updateProfile = async (req, res) => {
