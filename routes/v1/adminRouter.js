@@ -8,4 +8,4 @@ router.get("/profile");
 router.put("/update");
 router.get("/check-admin");
 
-Module.export = { adminRouter: router };
+module.exports = { adminRouter: router };
