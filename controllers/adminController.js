@@ -95,7 +95,7 @@ const logoutAdmin = async (req, res) => {
       httpOnly: true,
       secure: false,
     });
-    res.json({ success: true, message: "User logged out" });
+    res.json({ success: true, message: "admin logged out" });
   } catch (error) {
     res.status(404).json({ message: "faild to user logout" });
   }
@@ -122,7 +122,34 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-  } catch (error) {}
+    const admin = req.admin;
+    // Get update data from req.body
+    const { name, email, phone } = req.body;
+    // Store the data in a variable
+    const updateData = { name, email, phone };
+    // Updated user
+    const updateAdmin = await Admin.findByIdAndUpdate(admin.id, updateData, {
+      new: true,
+    });
+    // Check have any updated user
+    if (!updateAdmin) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    // Send response
+    res.json({
+      success: true,
+      message: "Admin profile updated successfully",
+      data: updateAdmin,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Error updating profile",
+      error: error.message,
+    });
+  }
 };
 
 const checkAdmin = async (req, res) => {
