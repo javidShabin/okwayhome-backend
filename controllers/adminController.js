@@ -91,7 +91,14 @@ const loginAdmin = async (req, res) => {
 
 const logoutAdmin = async (req, res) => {
   try {
-  } catch (error) {}
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+    });
+    res.json({ success: true, message: "User logged out" });
+  } catch (error) {
+    res.status(404).json({ message: "faild to user logout" });
+  }
 };
 
 const getProfile = async (req, res) => {
