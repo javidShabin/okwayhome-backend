@@ -12,12 +12,14 @@ const addItemToCart = async (req, res) => {
         message: "Items array is required and should not be empty.",
       });
     }
+
     // Find or create the user's cart
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
-    // Loop through items and add or update them in the cart
+
+    // Loop through items and check if any already exists in the cart
     for (let { product, quantity } of items) {
       const itemIndex = cart.items.findIndex(
         (item) => item.product.toString() === product
@@ -26,12 +28,15 @@ const addItemToCart = async (req, res) => {
       const productDetails = await Product.findById(product);
       if (!productDetails) {
         return res.status(404).json({
-          message: "item not found",
+          message: "Item not found",
         });
       }
+
       if (itemIndex > -1) {
-        // Update quantity if item already exists
-        cart.items[itemIndex].quantity += quantity;
+        // Item already exists in the cart, return an error
+        return res.status(400).json({
+          message: `Item is already in the cart.`,
+        });
       } else {
         // Add new item to cart
         cart.items.push({
@@ -42,6 +47,7 @@ const addItemToCart = async (req, res) => {
       }
     }
 
+    // Calculate total price
     let totalPrice = 0;
     for (let item of cart.items) {
       const product = await Product.findById(item.product);
@@ -51,9 +57,8 @@ const addItemToCart = async (req, res) => {
         item.price = product.price;
         item.ItemName = product.name; // Ensure ItemName is assigned before saving
         item.image = product.image; // Assign image if needed
-        console.log(item.price, "===price");
       } else {
-        throw new Error("item not found");
+        throw new Error("Item not found");
       }
     }
 
@@ -68,6 +73,7 @@ const addItemToCart = async (req, res) => {
     });
   }
 };
+
 // Get cart
 const getCart = async (req, res) => {
   try {
