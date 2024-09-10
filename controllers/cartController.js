@@ -71,7 +71,20 @@ const addItemToCart = async (req, res) => {
 // Get cart
 const getCart = async (req, res) => {
   try {
-  } catch (error) {}
+    const userId = req.user.id;
+
+    // Find the user using id
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found." });
+    }
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while fetching the cart.",
+      error: error.message,
+    });
+  }
 };
 // Update cart
 const updateCart = async (req, res) => {
