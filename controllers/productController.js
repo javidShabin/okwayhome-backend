@@ -1,22 +1,23 @@
 const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 const { Product } = require("../models/productModel");
 
-// Get all products 
+// Get all products
 const getAllProducts = async (req, res) => {
   try {
     // Get products from database and pass to response
     const products = await Product.find({});
-    return res.status(200).json( products);
+    return res.status(200).json(products);
   } catch (error) {
     res.status(404).json({ message: "Server not responese..." });
   }
 };
+// Get product by id
 const getProductById = async (req, res) => {
   try {
     // Get product id from req.params
-    const {id} = req.params
+    const { id } = req.params;
     // The item
-    const product = await Product.findOne({_id: id})
+    const product = await Product.findOne({ _id: id });
     // Check have the item in database
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -27,8 +28,33 @@ const getProductById = async (req, res) => {
     res.status(500).json({ message: "error fetching product", error });
   }
 };
-const fileterProduct = async (req, res) => {
-  res.send("hello");
+
+// Filtering products
+const filteredProduct = async (req, res) => {
+  try {
+    const category = req.query.category; // Fixed typo
+
+    // If no category is provided, return an error
+    if (!category) {
+      return res
+        .status(400)
+        .json({ message: "Category query parameter is required" });
+    }
+
+    // Search for product by category
+    const filteredProduct = await Product.find({ category: category });
+
+    // If no items found, return error
+    if (filteredProduct.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No items found in that category" });
+    }
+
+    res.status(200).json(filteredProduct); // Fixed variable name here
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching items", error });
+  }
 };
 
 // Create a product
@@ -80,8 +106,8 @@ const removeProduct = async (req, res) => {
 module.exports = {
   getAllProducts,
   getProductById,
-  fileterProduct,
   createProduct,
+  filteredProduct,
   updateProduct,
   removeProduct,
 };
