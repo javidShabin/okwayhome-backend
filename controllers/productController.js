@@ -6,10 +6,7 @@ const getAllProducts = async (req, res) => {
   try {
     // Get products from database and pass to response
     const products = await Product.find({});
-    return res.status(200).json({
-      message: "Product list",
-      data: products,
-    });
+    return res.status(200).json( products);
   } catch (error) {
     res.status(404).json({ message: "Server not responese..." });
   }
