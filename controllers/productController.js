@@ -12,7 +12,20 @@ const getAllProducts = async (req, res) => {
   }
 };
 const getProductById = async (req, res) => {
-  res.send("hello");
+  try {
+    // Get product id from req.params
+    const {id} = req.params
+    // The item
+    const product = await Product.findOne({_id: id})
+    // Check have the item in database
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    // if have the product
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: "error fetching product", error });
+  }
 };
 const fileterProduct = async (req, res) => {
   res.send("hello");
