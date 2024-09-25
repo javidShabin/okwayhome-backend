@@ -1,8 +1,18 @@
 const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 const { Product } = require("../models/productModel");
 
+// Get all products 
 const getAllProducts = async (req, res) => {
-  res.send("hello");
+  try {
+    // Get products from database and pass to response
+    const products = await Product.find({});
+    return res.status(200).json({
+      message: "Product list",
+      data: products,
+    });
+  } catch (error) {
+    res.status(404).json({ message: "Server not responese..." });
+  }
 };
 const getProductById = async (req, res) => {
   res.send("hello");
@@ -10,6 +20,8 @@ const getProductById = async (req, res) => {
 const fileterProduct = async (req, res) => {
   res.send("hello");
 };
+
+// Create a product
 const createProduct = async (req, res) => {
   try {
     const admin = req.admin;
