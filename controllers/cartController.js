@@ -162,7 +162,55 @@ const updateCart = async (req, res) => {
 // Remove from cart
 const removeFromCart = async (req, res) => {
   try {
-  } catch (error) {}
+    const { product } = req.body; // product ID from request body
+    const userId = req.user.id; // get user ID from req object
+
+    // Validate that product is provided
+    if (!product) {
+      return res.status(400).json({
+        message: "Menu item is required.",
+      });
+    }
+
+    // Find the cart of the user
+    const cart = await Cart.findOne({ user: userId });
+
+    // If cart not found, return 404
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found.",
+      });
+    }
+
+    // Filter out the product to remove it from the cart
+    cart.items = cart.items.filter(
+      (item) => item.product.toString() !== product
+    );
+
+    // Recalculate total price after removal
+    let totalPrice = 0;
+    for (let item of cart.items) {
+      const productDetails = await Product.findById(item.product);
+      if (productDetails) {
+        totalPrice += productDetails.price * item.quantity;
+      }
+    }
+
+    // Update total price in cart
+    cart.totalPrice = totalPrice;
+    await cart.save(); // Save the updated cart
+
+    // Return updated cart to client
+    return res.status(200).json({
+      message: "Item removed successfully.",
+      cart,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "An error occurred while removing the item from the cart.",
+      error: error.message,
+    });
+  }
 };
 
 module.exports = {
