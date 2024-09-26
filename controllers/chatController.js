@@ -27,7 +27,19 @@ const getChatHistory = async (req, res) => {
   }
 };
 
+// Remove all chats for a specific user
+const removeAllChats = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    await Chat.deleteMany({ user: userId });
+    res.status(200).json({ message: "All chats removed successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to remove chat history" });
+  }
+};
+
 module.exports = {
   sendMessage,
   getChatHistory,
+  removeAllChats,
 };
