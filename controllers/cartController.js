@@ -95,8 +95,70 @@ const getCart = async (req, res) => {
 // Update cart
 const updateCart = async (req, res) => {
   try {
-  } catch (error) {}
+    const { items } = req.body;
+    const userId = req.user.id;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        message: "Items array is required and should not be empty.",
+      });
+    }
+
+    // Find the user's cart
+    let cart = await Cart.findOne({ user: userId });
+    if (!cart) {
+      return res.status(404).json({
+        message: "Cart not found.",
+      });
+    }
+
+    // Loop through the items and update the quantity or other properties
+    for (let { product, quantity } of items) {
+      const itemIndex = cart.items.findIndex(
+        (item) => item.product.toString() === product
+      );
+
+      if (itemIndex > -1) {
+        // If item exists, update the quantity
+        if (quantity <= 0) {
+          // If quantity is 0 or less, remove the item from the cart
+          cart.items.splice(itemIndex, 1);
+        } else {
+          // Otherwise, update the quantity
+          cart.items[itemIndex].quantity = quantity;
+        }
+      } else {
+        return res.status(404).json({
+          message: `Menu item with ID ${product} not found in the cart.`,
+        });
+      }
+    }
+
+    // Recalculate the total price
+    let totalPrice = 0;
+    for (let item of cart.items) {
+      const productDetails = await Product.findById(item.product);
+      if (productDetails) {
+        totalPrice += productDetails.price * item.quantity;
+      } else {
+        return res.status(404).json({
+          message: "One or more menu items were not found.",
+        });
+      }
+    }
+
+    cart.totalPrice = totalPrice;
+    // Save the updated cart
+    await cart.save();
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred while updating the cart.",
+      error: error.message,
+    });
+  }
 };
+
 // Remove from cart
 const removeFromCart = async (req, res) => {
   try {
