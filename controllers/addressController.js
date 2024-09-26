@@ -49,8 +49,38 @@ const createAddress = async (req, res) => {
   }
 };
 // Get address
-const getAddress = async () => {};
+const getAddress = async () => {
+  try {
+    // Get userId from reqq.
+    const userId = req.user.id;
+    // Find the address using userId
+    const addess = await Address.find({ user: userId });
+    // Check if have any address
+    if (!addess) {
+      return res.status(400).json({ message: "Not have any address" });
+    }
+    res.status(200).json(addess);
+  } catch (error) {}
+};
 // Update address
-const updateAddress = async () => {};
+const updateAddress = async () => {
+  try {
+    // Get address id from req.params
+    const addressId = req.params.id;
+    const updatedData = req.body;
+    const address = await Address.findByIdAndUpdate(addressId, updatedData, {
+      new: true,
+    });
+    res.status(200).json(address);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 // Delete address
 const deleteAddress = async () => {};
+module.exports = {
+  createAddress,
+  updateAddress,
+  getAddress,
+  deleteAddress,
+};
