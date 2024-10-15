@@ -43,6 +43,7 @@ const registerUser = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
+      sameSite: "none"
     });
 
     // Return a success response
@@ -92,6 +93,7 @@ const loginUser = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
+      sameSite: "none"
     });
     res.status(201).json({ success: true, message: "User logged in" });
   } catch (error) {
@@ -105,6 +107,7 @@ const logoutUser = async (req, res) => {
     res.clearCookie("token", {
       httpOnly: true,
       secure: true,
+      sameSite: "none"
     });
     res.json({ success: true, message: "User logged out" });
   } catch (error) {}
