@@ -9,7 +9,7 @@ const port = 5000;
 
 app.use(
   cors({
-    origin: true,
+    origin: ["https://okwayhome-frontend.vercel.app"],
     credentials: true,
   })
 );

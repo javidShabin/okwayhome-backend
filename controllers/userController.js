@@ -1,6 +1,7 @@
 const { User } = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { generateToken } = require("../utils/token");
+const { cloudinaryInstance } = require("../config/cloudinaryConfig");
 
 const registerUser = async (req, res) => {
   try {
@@ -146,9 +147,31 @@ const updateProfile = async (req, res) => {
   try {
     const { user } = req;
     // Get update data from req.body
-    const { name, email, phone } = req.body;
+    const { name, email, phone, password } = req.body;
+
     // Store update in a variable
-    const updateData = { name, email, phone };
+    const updateData = { name, email, phone, password };
+    // Hash new password if user update is
+    if (updateData.password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(updateData.password, salt);
+    }
+
+    let uploadResult;
+
+    if (req.file) {
+      try {
+        uploadResult = await cloudinaryInstance.uploader.upload(req.file.path);
+        // Assign the uploaded image URL to the user's image field
+        updateData.image = uploadResult.secure_url;
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: "File upload failed",
+          error: uploadError.message,
+        });
+      }
+    }
     // Updated user
     const updatedUser = await User.findByIdAndUpdate(user.id, updateData, {
       new: true,
