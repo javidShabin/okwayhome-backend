@@ -1,20 +1,40 @@
 const jwt = require("jsonwebtoken");
 
-// Generate token using jwt
-const generateToken = ({ _id, email, role }) => {
+// Generate User token
+const generateUserToken = ({ _id, email, role }) => {
   try {
     const token = jwt.sign(
       {
         id: _id,
         email: email,
-        role: role,
+        role: role || "user",
       },
       process.env.JWT_SECRET_KEY
     );
     return token;
   } catch (error) {
-    console.log(error);
+    console.log("Error generating user token:", error);
+    return null; // Optional: return null to indicate failure
   }
 };
 
-module.exports = { generateToken };
+// Generate Admin token
+const generateAdminToken = ({ _id, email, role }) => {
+  try {
+    const token = jwt.sign(
+      {
+        id: _id,
+        email: email,
+        role: role || "admin",
+      },
+      process.env.JWT_SECRET_KEY
+    );
+    return token;
+  } catch (error) {
+    console.log("Error generating admin token:", error);
+    return null; // Optional: return null to indicate failure
+  }
+};
+
+
+module.exports = { generateUserToken, generateAdminToken };

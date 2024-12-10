@@ -3,17 +3,17 @@ const jwt = require("jsonwebtoken");
 const userAuth = (req, res, next) => {
   try {
     // Get token from cookies
-    const { token } = req.cookies;
+    const { userToken } = req.cookies;
 
     // Check if have the cookie
-    if (!token) {
+    if (!userToken) {
       return res.status(401).json({
         success: false,
         message: "user not autherized",
       });
     }
     // Token verification
-    const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const verifyToken = jwt.verify(userToken, process.env.JWT_SECRET_KEY);
     if (!verifyToken) {
       return res.status(401).json({
         success: false,

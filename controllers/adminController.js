@@ -56,7 +56,7 @@ const loginAdmin = async (req, res) => {
     // Get values from req.body
     const { name, email, password } = req.body;
     // Check if required field are present
-    if (!email || !password) {
+    if (!name || !email || !password) {
       return res
         .status(400)
         .json({ success: false, message: "All fields are required" });

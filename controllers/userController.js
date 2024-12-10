@@ -1,7 +1,7 @@
 const { User } = require("../models/userModel");
 const bcrypt = require("bcrypt");
-const { generateToken } = require("../utils/token");
 const { cloudinaryInstance } = require("../config/cloudinaryConfig");
+const { generateUserToken } = require("../utils/token");
 
 const registerUser = async (req, res) => {
   try {
@@ -33,14 +33,14 @@ const registerUser = async (req, res) => {
     await newUser.save();
 
     // Generate a token
-    const token = generateToken({
+    const token = generateUserToken({
       _id: newUser._id,
       email: newUser.email,
-      role: "customer",
+      role: "user",
     });
 
     // Pass the token as a cookie (the token will expire in one hour)
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none"
@@ -87,10 +87,10 @@ const loginUser = async (req, res) => {
         .json({ success: false, message: "Unatherised access" });
     }
     // Generate token
-    const token = generateToken(isUserExist._id);
+    const token = generateUserToken(isUserExist._id);
 
     // Pass token as cookie the token will expire in one hour
-    res.cookie("token", token, {
+    res.cookie("userToken", token, {
       httpOnly: true,
       secure: true,
       sameSite: "none"
@@ -104,7 +104,7 @@ const loginUser = async (req, res) => {
 // Logout user
 const logoutUser = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("userToken", {
       httpOnly: true,
       secure: true,
       sameSite: "none"
